@@ -37,14 +37,16 @@ function tickToPice(tick) {
 }
 
 async function getPositionInfo(url, positionId) {
-  try {
-    const response = await axios.post(url, { query: buildPositionQuery(positionId) }, { 
-      headers: { "Accept-Encoding": "gzip,deflate,compress" } 
-    });
-    return response.data["pools"][0];
-  } catch(error) {
-    debugger;
-  }
+  const response = await axios.post(
+    url,     
+    { query: buildPositionQuery(positionId) }, 
+    { headers: { "Accept-Encoding": "gzip,deflate,compress" } 
+  });
+  return response.data["pools"][0];
+}
+
+async function getPoolInfo(url, poolId) {
+
 }
 
 async function getLoss(url, positionId) {

@@ -12,6 +12,8 @@
   "dependencies": {
     "@openzeppelin/contracts": "^3.4.1-solc-0.7-2",
     "@uniswap/v3-core": "^1.0.1",
-    "@uniswap/v3-periphery": "^1.4.3"
+    "@uniswap/v3-periphery": "^1.4.3",
+    "winston": "^3.8.2",
+    "winston-daily-rotate-file": "^4.7.1"
   }
 }

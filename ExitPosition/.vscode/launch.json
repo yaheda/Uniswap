@@ -12,7 +12,8 @@
         "<node_internals>/**"
       ],
       "program": "${workspaceFolder}\\server\\app.js",
-      "envFile": "${workspaceFolder}\\server\\.env"
+      "envFile": "${workspaceFolder}\\server\\.env",
+      "outputCapture": "std"
     }
   ]
 }
