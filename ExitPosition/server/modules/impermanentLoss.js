@@ -21,6 +21,10 @@ function buildPositionQuery (positionId) {
         symbol
         decimals
       }
+      depositedToken0
+      depositedToken1
+      withdrawnToken0
+      withdrawnToken1
     }
   }`;
 }
@@ -49,7 +53,7 @@ async function getPositionInfo(url, positionId) {
     throw new Error('position not found');
 
   var position = response.data.data["positions"][0];
-
+////// https://whiteboardcrypto.com/impermanent-loss-calculator/
   return {
     liquidity: parseInt(position["liquidity"]),
     tick_lower: parseInt(position["tickLower"]["tickIdx"]),
@@ -60,6 +64,13 @@ async function getPositionInfo(url, positionId) {
     token1: position["token1"]["symbol"],
     decimals0: parseInt(position["token0"]["decimals"]),
     decimals1: parseInt(position["token1"]["decimals"]),
+
+    depositedToken0: position["depositedToken0"],
+    depositedToken1: position["depositedToken1"],
+    withdrawnToken0: position["withdrawnToken0"],
+    withdrawnToken1: position["withdrawnToken1"],
+    collectedFeesToken0: position["collectedFeesToken0"],
+    collectedFeesToken1: position["collectedFeesToken1"],
   };
 }
 
@@ -98,8 +109,8 @@ async function getLoss(url, positionId) {
 
   if (positionInfo.tick_upper <= poolInfo.current_tick) {
     amount0 = 0;
-    amount1 = position.liquidity * (sb - sa);
-  } else if (positionInfo.tick_lower < poolInfo.current_tick && current_tick < positionInfo.tick_upper) {
+    amount1 = positionInfo.liquidity * (sb - sa);
+  } else if (positionInfo.tick_lower < poolInfo.current_tick && poolInfo.current_tick < positionInfo.tick_upper) {
     amount0 = positionInfo.liquidity * (sb - poolInfo.current_sqrt_price) / (poolInfo.current_sqrt_price * sb);
     amount1 = positionInfo.liquidity * (poolInfo.current_sqrt_price - sa);
   } else {
