@@ -17,7 +17,9 @@ cron.schedule("*/5 * * * * *", async function () {
   try {
     var loss = await imperamentLoss.getLoss(url, positionId);
     console.log(loss.toString);
-    
+    console.log(loss.toHOLDSString);
+    console.log(loss.percentage_loss + ' %');
+
   } catch (error) {
     logger.error(error);
   }

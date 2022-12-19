@@ -92,6 +92,19 @@ async function getPoolInfo(url, poolId) {
   };
 }
 
+function calculateLoss(
+  current_price, 
+  liquidity_amount0, liquidity_amount1,
+  hodl_amount0, hodl_amount1) {
+  
+  var hodl_value = hodl_amount0 + (hodl_amount1 / current_price);
+  var liquidity_value = liquidity_amount0 + (liquidity_amount1 / current_price);
+
+  var percentage_loss = (1 - (liquidity_value / hodl_value)) * 100;
+
+  return percentage_loss;
+}
+
 async function getLoss(url, positionId) {
 
   var toString = '';
@@ -133,8 +146,17 @@ async function getLoss(url, positionId) {
     `and ${adjusted_amount1} ${positionInfo.token1} ` +
     `at the current price`;
 
+  var toHOLDSString = `HODL Value: ${positionInfo.depositedToken0} ${positionInfo.token0} and ${positionInfo.depositedToken1} ${positionInfo.token1}`;
+
+  var percentage_loss = calculateLoss(
+    adjusted_current_price, 
+    adjusted_amount0, adjusted_amount1, 
+    positionInfo.depositedToken0, positionInfo.depositedToken1);
+
   return {
-    toString: toString
+    toString: toString,
+    toHOLDSString: toHOLDSString,
+    percentage_loss: percentage_loss
   }
 }
 
