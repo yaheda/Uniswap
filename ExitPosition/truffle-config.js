@@ -41,10 +41,10 @@
  * https://trufflesuite.com/docs/truffle/getting-started/using-the-truffle-dashboard/
  */
 
-// require('dotenv').config();
-// const { MNEMONIC, PROJECT_ID } = process.env;
+require('dotenv').config();
+const { PRIVATE_KEY } = process.env;
 
-// const HDWalletProvider = require('@truffle/hdwallet-provider');
+const HDWalletProvider = require('@truffle/hdwallet-provider');
 const path = require("path");
 
 module.exports = {
@@ -59,6 +59,16 @@ module.exports = {
    */
   contracts_build_directory: path.join(__dirname, "server/contracts"),
   networks: {
+    goerli: {
+      provider: () => new HDWalletProvider(
+        [PRIVATE_KEY],
+        `https://goerli.infura.io/v3/840994ee89b5433e87463df368896c27`, 0, 3),
+      network_id: 5,     // Goerli's id
+      //gas: 30000000,
+      //gasPrice: 25000000000
+      skipDryRun: false
+    }
+
     // Useful for testing. The `development` name is special - truffle uses it by default
     // if it's defined here and no other network is specified at the command line.
     // You should run a client (like ganache, geth, or parity) in a separate terminal
