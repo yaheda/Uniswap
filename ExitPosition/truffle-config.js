@@ -43,6 +43,7 @@
 
 require('dotenv').config();
 const { PRIVATE_KEY } = process.env;
+//console.log(PRIVATE_KEY);
 
 const HDWalletProvider = require('@truffle/hdwallet-provider');
 const path = require("path");
@@ -66,7 +67,9 @@ module.exports = {
       network_id: 5,     // Goerli's id
       //gas: 30000000,
       //gasPrice: 25000000000
-      skipDryRun: false
+      skipDryRun: false,
+      networkCheckTimeout: 10000,
+      timeoutBlocks: 200
     }
 
     // Useful for testing. The `development` name is special - truffle uses it by default
@@ -124,7 +127,7 @@ module.exports = {
          enabled: true,
          runs: 200
        },
-       evmVersion: "byzantium"
+       //evmVersion: "byzantium"
       }
     }
   }
