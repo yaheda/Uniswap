@@ -7,9 +7,11 @@ The project is split into two parts.
 Here we wrap Uniswap's V3 liquidity functions. When minting a new token the tokenID is stored in the smart contract for the purpose
 of this exersise. This can be stored onchain or offchain, depends on the specific requirements really. To store them offchain you can do so by emiting an event in the smart contract and get the values.
 
+Also for this excersise we use a DAI/USDC pair minting 100 * 1e18 and 100 * 1e6 respectively with a pool fee of 100. All these parameters can be passed via an interface.
+
 Do note the contract needs to be approved in order to call TransHelper.safeTransferFrom.
 
-Then when exiting the position we get all the liquity by calling nonfungiblePositionManager.decreaseLiquidity.
+Then when exiting the position we get all the liquidity by calling nonfungiblePositionManager.decreaseLiquidity.
 
 To wrap up we send the tokens back to the user by calling nonfungiblePositionManager.collect then transfering the amounts back to the wallet
 
