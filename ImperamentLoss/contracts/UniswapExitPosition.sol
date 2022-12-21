@@ -201,9 +201,6 @@ contract UniswapExitPosition is IERC721Receiver {
         console.log(amount0);
         console.log(amount1);
 
-        //TransferHelper.safeApprove(DAI, address(nonfungiblePositionManager), amount0ToMint);
-        //TransferHelper.safeApprove(USDC, address(nonfungiblePositionManager), amount1ToMint);
-
         TransferHelper.safeTransfer(token0, owner, amount0);
         TransferHelper.safeTransfer(token1, owner, amount1);
     }
