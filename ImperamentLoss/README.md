@@ -2,7 +2,7 @@ Exit Uniswap v3 liquidity pool when impermanent loss is greater than 50%.
 
 The project is split into two parts.
 
-1. The smart contract
+<h2>1. The smart contract</h2>
 
 Here we wrap Uniswap's V3 liquidity functions. When minting a new token the tokenID is stored in the smart contract for the purpose
 of this exersise. This can be stored onchain or offchain, depends on the specific requirements really. To store them offchain you can do so by emiting an event in the smart contract and get the values.
@@ -18,7 +18,7 @@ To wrap up we send the tokens back to the user by calling nonfungiblePositionMan
 To test:
 npx hardhat test
 
-2. The server
+<h2>2. The server</h2>
 
 Here we have a cron job that pings our imperament loss function.
 
