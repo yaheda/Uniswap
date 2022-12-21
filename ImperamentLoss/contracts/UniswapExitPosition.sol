@@ -34,6 +34,9 @@ contract UniswapExitPosition is IERC721Receiver {
 
     mapping(uint256 => Deposit) public deposits;
 
+    // Store token id used in this example
+    uint public tokenId;
+
     constructor(
         //INonfungiblePositionManager _nonfungiblePositionManager
     ) {
@@ -54,13 +57,15 @@ contract UniswapExitPosition is IERC721Receiver {
         return this.onERC721Received.selector;
     }
 
-    function _createDeposit(address owner, uint256 tokenId) internal {
+    function _createDeposit(address owner, uint256 _tokenId) internal {
         (, , address token0, address token1, , , , uint128 liquidity, , , , ) =
-            nonfungiblePositionManager.positions(tokenId);
+            nonfungiblePositionManager.positions(_tokenId);
 
         // set the owner and data for position
         // operator is msg.sender
-        deposits[tokenId] = Deposit({owner: owner, liquidity: liquidity, token0: token0, token1: token1});
+        deposits[_tokenId] = Deposit({owner: owner, liquidity: liquidity, token0: token0, token1: token1});
+
+        tokenId = _tokenId;
     }
 
     function mintNewPosition()
@@ -81,15 +86,13 @@ contract UniswapExitPosition is IERC721Receiver {
         uint amount1ToMint = 100 * 1e6;
 
         // transfer tokens to contract
-        //TransferHelper.safeTransferFrom(LINK, msg.sender, address(this), amount0ToMint);
-        //TransferHelper.safeTransferFrom(USDC, msg.sender, address(this), amount1ToMint);
+        TransferHelper.safeTransferFrom(LINK, msg.sender, address(this), amount0ToMint);
+        TransferHelper.safeTransferFrom(USDC, msg.sender, address(this), amount1ToMint);
 
         // Approve the position manager
-        console.log('Before sApproved');
+        
         TransferHelper.safeApprove(LINK, address(nonfungiblePositionManager), amount0ToMint);
         TransferHelper.safeApprove(USDC, address(nonfungiblePositionManager), amount1ToMint);
-
-        console.log('Approved');
 
         INonfungiblePositionManager.MintParams memory params =
             INonfungiblePositionManager.MintParams({
@@ -108,7 +111,8 @@ contract UniswapExitPosition is IERC721Receiver {
 
         // Note that the pool defined by LINK/USDC and fee tier 0.3% must already be created and initialized in order to mint
         (tokenId, liquidity, amount0, amount1) = nonfungiblePositionManager.mint(params);
-
+        console.log('tokenId:');
+        console.log(tokenId);
         // Create a deposit
         _createDeposit(msg.sender, tokenId);
 
@@ -117,17 +121,20 @@ contract UniswapExitPosition is IERC721Receiver {
             TransferHelper.safeApprove(LINK, address(nonfungiblePositionManager), 0);
             uint256 refund0 = amount0ToMint - amount0;
             TransferHelper.safeTransfer(LINK, msg.sender, refund0);
+            console.log('SF LINK');
+            console.log(refund0);
         }
 
         if (amount1 < amount1ToMint) {
             TransferHelper.safeApprove(USDC, address(nonfungiblePositionManager), 0);
             uint256 refund1 = amount1ToMint - amount1;
             TransferHelper.safeTransfer(USDC, msg.sender, refund1);
+            console.log('SF USD');
         }
     }
 
 
-    function exitPosition(uint256 tokenId) external returns (uint256 amount0, uint256 amount1) {
+    function exitPosition(uint256 tokenId) external returns (uint256 amount0, uint256 amount1,uint256 camount0, uint256 camount1) {
         // caller must be the owner of the NFT
         require(msg.sender == deposits[tokenId].owner, 'Not the owner');
         // get liquidity data for tokenId
@@ -147,8 +154,36 @@ contract UniswapExitPosition is IERC721Receiver {
 
         (amount0, amount1) = nonfungiblePositionManager.decreaseLiquidity(params);
 
+        INonfungiblePositionManager.CollectParams memory params1 =
+            INonfungiblePositionManager.CollectParams({
+                tokenId: tokenId,
+                recipient: address(this),
+                amount0Max: type(uint128).max,
+                amount1Max: type(uint128).max
+            });
+
+        (camount0, camount1) = nonfungiblePositionManager.collect(params1);
+
         //send liquidity back to owner
-        _sendToOwner(tokenId, amount0, amount1);
+        //_sendToOwner(tokenId, amount0, amount1);
+    }
+
+    function getLiquidity(uint _tokenId) external view returns (uint128) {
+        (
+            ,
+            ,
+            ,
+            ,
+            ,
+            ,
+            ,
+            uint128 liquidity,
+            ,
+            ,
+            ,
+
+        ) = nonfungiblePositionManager.positions(_tokenId);
+        return liquidity;
     }
 
     function _sendToOwner(
@@ -162,6 +197,13 @@ contract UniswapExitPosition is IERC721Receiver {
         address token0 = deposits[tokenId].token0;
         address token1 = deposits[tokenId].token1;
         // send collected fees to owner
+
+        console.log(amount0);
+        console.log(amount1);
+
+        //TransferHelper.safeApprove(LINK, address(nonfungiblePositionManager), amount0ToMint);
+        //TransferHelper.safeApprove(USDC, address(nonfungiblePositionManager), amount1ToMint);
+
         TransferHelper.safeTransfer(token0, owner, amount0);
         TransferHelper.safeTransfer(token1, owner, amount1);
     }

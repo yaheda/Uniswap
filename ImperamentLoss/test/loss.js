@@ -61,37 +61,51 @@ describe("UniswapExitPosition contract", function () {
     await dai.connect(daiWhale).transfer(accounts[0].address, daiAmount)
     await usdc.connect(usdcWhale).transfer(accounts[0].address, usdcAmount)
 
+    console.log(`dai initial ${await dai.balanceOf(instance.address)}`)
+    console.log(`usdc initial ${await usdc.balanceOf(instance.address)}`)
+
   })
 
   describe('Mint New Token', () => {
     it('Should mint new token', async () => {
-
-      var owner = accounts[0];
-
-
-      //console.log(owner);
-      
       const daiAmount = 100n * 10n ** 18n;
       const usdcAmount = 100n * 10n ** 6n;
 
-      //await dai.connect(owner).approve(instance.address, daiAmount);
-      //await usdc.connect(owner).approve(instance.address, usdcAmount);
+      //await dai.connect(accounts[0]).transfer(instance.address, daiAmount);
+      //await usdc.connect(accounts[0]).transfer(instance.address, usdcAmount);
 
-     
-
-      await dai
-        .connect(accounts[0])
-        .transfer(instance.address, daiAmount);
-
-      await usdc
-        .connect(accounts[0])
-        .transfer(instance.address, usdcAmount);
+      await dai.connect(accounts[0]).approve(instance.address, daiAmount)
+      await usdc.connect(accounts[0]).approve(instance.address, usdcAmount)
 
       var tx = await instance.mintNewPosition();
-      console.log(tx);
+      //console.log(tx);
 
+    });
+    it("exitPosition", async () => {
+      const tokenId = await instance.tokenId();
 
+      console.log("--- Exit liquidity ---")
+
+      console.log(`dai before ${await dai.balanceOf(instance.address)}`)
+      console.log(`usdc before ${await usdc.balanceOf(instance.address)}`)
+
+      var liquidityBefore = await instance.getLiquidity(tokenId);
+  
+
+      await instance.exitPosition(tokenId);
+
+      var liquidityAfter = await instance.getLiquidity(tokenId)
+
+      console.log(`dai ${await dai.balanceOf(instance.address)}`)
+      console.log(`usdc ${await usdc.balanceOf(instance.address)}`)
+  
+      console.log("--- decrease liquidity ---")
+      console.log(`liquidity before ${liquidityBefore}`)
+      console.log(`liquidity after ${liquidityAfter}`)
+      //console.log(`dai ${await dai.balanceOf(liquidityExamples.address)}`)
+      //console.log(`usdc ${await usdc.balanceOf(liquidityExamples.address)}`)
     })
-  })
+  });
+
 
 });
