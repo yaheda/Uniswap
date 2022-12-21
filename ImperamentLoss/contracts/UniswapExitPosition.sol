@@ -14,10 +14,10 @@ import "hardhat/console.sol";
 
 contract UniswapExitPosition is IERC721Receiver {
 
-    //address public constant LINK = 0x326C977E6efc84E512bB9C30f76E30c160eD06FB;
+    //address public constant DAI = 0x326C977E6efc84E512bB9C30f76E30c160eD06FB;
     //address public constant USDC = 0x07865c6E87B9F70255377e024ace6630C1Eaa37F;
 
-    address public constant LINK = 0x6B175474E89094C44Da98b954EedeAC495271d0F;
+    address public constant DAI = 0x6B175474E89094C44Da98b954EedeAC495271d0F;
     address public constant USDC = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
 
     uint24 public constant poolFee = 100;
@@ -86,17 +86,17 @@ contract UniswapExitPosition is IERC721Receiver {
         uint amount1ToMint = 100 * 1e6;
 
         // transfer tokens to contract
-        TransferHelper.safeTransferFrom(LINK, msg.sender, address(this), amount0ToMint);
+        TransferHelper.safeTransferFrom(DAI, msg.sender, address(this), amount0ToMint);
         TransferHelper.safeTransferFrom(USDC, msg.sender, address(this), amount1ToMint);
 
         // Approve the position manager
         
-        TransferHelper.safeApprove(LINK, address(nonfungiblePositionManager), amount0ToMint);
+        TransferHelper.safeApprove(DAI, address(nonfungiblePositionManager), amount0ToMint);
         TransferHelper.safeApprove(USDC, address(nonfungiblePositionManager), amount1ToMint);
 
         INonfungiblePositionManager.MintParams memory params =
             INonfungiblePositionManager.MintParams({
-                token0: LINK,
+                token0: DAI,
                 token1: USDC,
                 fee: poolFee,
                 tickLower: TickMath.MIN_TICK,
@@ -109,7 +109,7 @@ contract UniswapExitPosition is IERC721Receiver {
                 deadline: block.timestamp
             });
 
-        // Note that the pool defined by LINK/USDC and fee tier 0.3% must already be created and initialized in order to mint
+        // Note that the pool defined by DAI/USDC and fee tier 0.3% must already be created and initialized in order to mint
         (tokenId, liquidity, amount0, amount1) = nonfungiblePositionManager.mint(params);
         console.log('tokenId:');
         console.log(tokenId);
@@ -118,10 +118,10 @@ contract UniswapExitPosition is IERC721Receiver {
 
         // Remove allowance and refund in both assets.
         if (amount0 < amount0ToMint) {
-            TransferHelper.safeApprove(LINK, address(nonfungiblePositionManager), 0);
+            TransferHelper.safeApprove(DAI, address(nonfungiblePositionManager), 0);
             uint256 refund0 = amount0ToMint - amount0;
-            TransferHelper.safeTransfer(LINK, msg.sender, refund0);
-            console.log('SF LINK');
+            TransferHelper.safeTransfer(DAI, msg.sender, refund0);
+            console.log('SF DAI');
             console.log(refund0);
         }
 
@@ -165,7 +165,7 @@ contract UniswapExitPosition is IERC721Receiver {
         (camount0, camount1) = nonfungiblePositionManager.collect(params1);
 
         //send liquidity back to owner
-        //_sendToOwner(tokenId, amount0, amount1);
+        _sendToOwner(tokenId, camount0, camount1);
     }
 
     function getLiquidity(uint _tokenId) external view returns (uint128) {
@@ -201,7 +201,7 @@ contract UniswapExitPosition is IERC721Receiver {
         console.log(amount0);
         console.log(amount1);
 
-        //TransferHelper.safeApprove(LINK, address(nonfungiblePositionManager), amount0ToMint);
+        //TransferHelper.safeApprove(DAI, address(nonfungiblePositionManager), amount0ToMint);
         //TransferHelper.safeApprove(USDC, address(nonfungiblePositionManager), amount1ToMint);
 
         TransferHelper.safeTransfer(token0, owner, amount0);

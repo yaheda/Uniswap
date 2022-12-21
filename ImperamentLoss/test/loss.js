@@ -6,7 +6,6 @@ const { expect } = require("chai");
 const DAI = "0x6B175474E89094C44Da98b954EedeAC495271d0F"
 const USDC = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
 
-
 const DAI_WHALE = "0x97f991971a37D4Ca58064e6a98FC563F03A71E5c"
 const USDC_WHALE = "0x97f991971a37D4Ca58064e6a98FC563F03A71E5c"
 
@@ -24,19 +23,13 @@ describe("UniswapExitPosition contract", function () {
     //   "0x495a9A432bCe84460C39C2dE63F9dd07d904519a" // The deployed contract address
     // );
 
-    const UniswapExitPosition = await ethers.getContractFactory(
-      "UniswapExitPosition"
-    )
+    const UniswapExitPosition = await ethers.getContractFactory("UniswapExitPosition")
 
     instance = await UniswapExitPosition.deploy();
     await instance.deployed();
 
     dai = await ethers.getContractAt("IERC20", DAI)
     usdc = await ethers.getContractAt("IERC20", USDC)
-
-
-
-    //-----
 
     // Unlock DAI and USDC whales
     await network.provider.request({
@@ -66,7 +59,7 @@ describe("UniswapExitPosition contract", function () {
 
   })
 
-  describe('Mint New Token', () => {
+  describe('Exit Position', () => {
     it('Should mint new token', async () => {
       const daiAmount = 100n * 10n ** 18n;
       const usdcAmount = 100n * 10n ** 6n;
@@ -78,32 +71,41 @@ describe("UniswapExitPosition contract", function () {
       await usdc.connect(accounts[0]).approve(instance.address, usdcAmount)
 
       var tx = await instance.mintNewPosition();
+
       //console.log(tx);
 
     });
-    it("exitPosition", async () => {
+    it("Should exit position", async () => {
       const tokenId = await instance.tokenId();
 
-      console.log("--- Exit liquidity ---")
+      console.log("--- Exit Position ---");
 
-      console.log(`dai before ${await dai.balanceOf(instance.address)}`)
-      console.log(`usdc before ${await usdc.balanceOf(instance.address)}`)
+      var daiBefore = await dai.balanceOf(accounts[0].address);
+      var usdBefore = await usdc.balanceOf(accounts[0].address);
 
       var liquidityBefore = await instance.getLiquidity(tokenId);
   
-
       await instance.exitPosition(tokenId);
 
-      var liquidityAfter = await instance.getLiquidity(tokenId)
+      var liquidityAfter = await instance.getLiquidity(tokenId);
 
-      console.log(`dai ${await dai.balanceOf(instance.address)}`)
-      console.log(`usdc ${await usdc.balanceOf(instance.address)}`)
-  
-      console.log("--- decrease liquidity ---")
-      console.log(`liquidity before ${liquidityBefore}`)
-      console.log(`liquidity after ${liquidityAfter}`)
-      //console.log(`dai ${await dai.balanceOf(liquidityExamples.address)}`)
-      //console.log(`usdc ${await usdc.balanceOf(liquidityExamples.address)}`)
+      var daiAfter = await dai.balanceOf(accounts[0].address);
+      var usdAfter = await usdc.balanceOf(accounts[0].address);
+
+      console.log(`dai before ${daiBefore}`);
+      console.log(`usdc before ${usdBefore}`);
+      console.log(`dai ${daiAfter}`);
+      console.log(`usdc ${usdAfter}`);
+      console.log(`liquidity before ${liquidityBefore}`);
+      console.log(`liquidity after ${liquidityAfter}`);
+
+      
+      expect(daiAfter).to.be.greaterThan(daiBefore);
+      expect(usdAfter).to.be.greaterThan(usdBefore);
+      expect(liquidityAfter).to.be.lessThan(liquidityBefore);
+      expect(liquidityAfter).to.be.equal(0);
+      
+
     })
   });
 

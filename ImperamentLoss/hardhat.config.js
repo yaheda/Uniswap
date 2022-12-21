@@ -1,8 +1,7 @@
 require("@nomicfoundation/hardhat-toolbox");
-
 require('dotenv').config();
 const { PRIVATE_KEY } = process.env;
-console.log(PRIVATE_KEY);
+
 /// https://github.com/daulathussain/defi-uniswap/blob/main/test/Liqudity.js
 /// https://github.com/stakewithus/defi-by-example/tree/main/uni-v3
 
@@ -18,7 +17,7 @@ module.exports = {
       },
     },
   },
-
+  
   networks: {
     hardhat: {
       forking: {
