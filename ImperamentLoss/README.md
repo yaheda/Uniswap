@@ -22,10 +22,10 @@ Here we have a cron job that pings our imperament loss function.
 
 This function fetches token information from the subgraph and calulcates the imperament loss which is the difference between the current amounts in the pool and the amounts if the tokens were held. I'm using ethers.providers.AlchemyProvider but feel free to swap it with your desired provider. 
 
-You'll need an .env file to store the following:
-LOGGER_LEVEL='debug'
-UNISWAP_GRAPH_URL='[the subgrapgh url]'
-UNISWAP_POSITION_ID='[the position id]'
-PRIVATE_KEY='[the wallet private key]'
-CONTRACT_ADDRESS='[the smartcontract address]'
-API_KEY='[alchemy api key]'
+You'll need an .env file to store the following: <br/>
+LOGGER_LEVEL='debug' <br/>
+UNISWAP_GRAPH_URL='[the subgrapgh url]' <br/>
+UNISWAP_POSITION_ID='[the position id]' <br/>
+PRIVATE_KEY='[the wallet private key]' <br/>
+CONTRACT_ADDRESS='[the smartcontract address]' <br/>
+API_KEY='[alchemy api key]' <br/>
